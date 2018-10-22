@@ -6,6 +6,9 @@ use app\models\User;
 use yii\web\Response;
 use app\models\Payment;
 use app\models\TypePay;
+use app\models\RecieveMoney;
+use app\models\TyeReceive;
+use app\models\DaoCar;
 
 use Imagine\Image\Box;
 use yii\imagine\Image;
@@ -92,7 +95,7 @@ class ApiController extends \yii\web\Controller
 
     }
 
-    public function actionListpayment($user_id){
+    public function actionListpayment(){
         $model=Payment::find()
         ->joinWith(['typePay','user'])
         ->asArray()->orderby('id DESC ,date DESC')->all();
@@ -100,31 +103,156 @@ class ApiController extends \yii\web\Controller
         return $model;
     }
 
+    public function actionListrecive(){
+        $model=RecieveMoney::find()
+        ->joinWith(['tyeReceive','user'])
+        ->asArray()->orderby('id DESC ,date DESC')->all();
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+        return $model;
+    }
+	
+	public function actionListdaocar(){
+        $model=DaoCar::find()
+        ->asArray()->orderby('date DESC')->all();
+		\Yii::$app->response->format = Response::FORMAT_JSON;
+        return $model;
+    }
+
+	public function actionSumdaocar()
+	{
+		$saving=\Yii::$app->db->createCommand('SELECT sum(amount) FROM dao_car where status="Saving"')->queryScalar();
+        $paid=\Yii::$app->db->createCommand('SELECT sum(amount) FROM dao_car where status="Paid"')->queryScalar();
+        $remark=\Yii::$app->db->createCommand('SELECT sum(amount) FROM dao_car where status="remark"')->queryScalar();
+       $model=['saving'=>$saving,'paid'=>$paid,'remark'=>$remark];
+	   \Yii::$app->response->format = Response::FORMAT_JSON;
+        return $model; 
+	}
     public function actionListtypepay(){
         $model=TypePay::find()->all();
         \Yii::$app->response->format = Response::FORMAT_JSON;
         return $model;
     }
+	public function actionListtyperecive(){
+        $model=TyeReceive::find()->all();
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+        return $model;
+    }
 
-    public function actionCreatepayment(){
-        $model=new Payment();
+    public function actionCreateorupdatepayment(){
         if(isset($_POST['amount']))
         {
+            if($_POST['id']=='null')
+            {
+                $model=new Payment();
+                $model->refer_id=substr(md5(mt_rand()),0,7).date('Ymdhis');
+            }else{
+                $model=Payment::find()->where(['id'=>(int)$_POST['id']])->one();
+            }
             $model->amount=$_POST['amount'];
             $model->description=$_POST['description'];
             $model->date=date('Y-m-d',strtotime($_POST['date']));
-            $model->refer_id=substr(md5(mt_rand()),0,7).date('Ymdhis');
             $model->type_pay_id=$_POST['type_id'];
             $model->user_id=$_POST['user_id'];
             if($model->save())
             {
                 $result=true;
             }else{
-                $result='ທ່ານ​ຕ້ອງ​ປ້ອນ​ຂໍ້​ມ​ູນ​ໃຫ້​ຄອບ';
+                $result='ທ່ານ​ຕ້ອງ​ປ້ອນ​ຂໍ້​ມ​ູນ​ໃຫ້​​ຄອບ​ກ່ອນ.!';
             }
             \Yii::$app->response->format = Response::FORMAT_JSON;
             return $result;
         }
+    }
+	
+	public function actionCreateorupdaterecive(){
+        if(isset($_POST['amount']))
+        {
+            if($_POST['id']=='null')
+            {
+                $model=new RecieveMoney();
+                $model->refer_id=substr(md5(mt_rand()),0,7).date('Ymdhis');
+            }else{
+                $model=RecieveMoney::find()->where(['id'=>(int)$_POST['id']])->one();
+            }
+            $model->amount=$_POST['amount'];
+            $model->description=$_POST['description'];
+            $model->date=date('Y-m-d',strtotime($_POST['date']));
+            $model->tye_receive_id=$_POST['type_id'];
+            $model->user_id=$_POST['user_id'];
+            if($model->save())
+            {
+                $result=true;
+            }else{
+                $result='ທ່ານ​ຕ້ອງ​ປ້ອນ​ຂໍ້​ມູ​ນ​ໃຫ້​​ຄອບ​ກ່ອນ.!';
+            }
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            return $result;
+        }
+    }
+
+	public function actionCreateorupdatedaocar(){
+        if(isset($_POST['amount']))
+        {
+            if($_POST['id']=='null')
+            {
+                $model=new DaoCar();
+                $model->refer_id=substr(md5(mt_rand()),0,7).date('Ymdhis');
+            }else{
+                $model=DaoCar::find()->where(['id'=>(int)$_POST['id']])->one();
+            }
+            $model->amount=$_POST['amount'];
+            $model->status=$_POST['status'];
+            $model->date=date('Y-m-d',strtotime($_POST['date']));
+            $model->remark=$_POST['remark'];
+            if($model->save())
+            {
+                $result=true;
+            }else{
+                $result='ທ່ານ​ຕ້ອງ​ປ້ອນ​ຂໍ້​ມູ​ນ​ໃຫ້​​ຄອບ​ກ່ອນ.!';
+            }
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            return $result;
+        }
+    }
+
+	
+    public function actionPaymentdelete($id)
+    {
+        $model=Payment::find()->where(['id'=>$id])->one();
+        if($model->delete())
+        {
+            return $this->redirect(['api/listpayment']);
+        }
+    }
+	public function actionRecivedelete($id)
+    {
+        $model=RecieveMoney::find()->where(['id'=>$id])->one();
+        if($model->delete())
+        {
+            return $this->redirect(['api/listrecive']);
+        }
+    }
+
+    public function actionListpaymentpk($id){
+        $model=Payment::find()
+        ->joinWith(['typePay','user'])
+        ->asArray()->where(['payment.id'=>$id])->orderby('id DESC ,date DESC')->one();
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+        return $model;
+    }
+	
+	public function actionListrecivepk($id){
+        $model=RecieveMoney::find()
+        ->joinWith(['tyeReceive','user'])
+        ->asArray()->where(['recieve_money.id'=>$id])->orderby('id DESC ,date DESC')->one();
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+        return $model;
+    }
+	public function actionListdaocarpk($id){
+        $model=DaoCar::find()
+        ->asArray()->where(['id'=>$id])->orderby('id DESC ,date DESC')->one();
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+        return $model;
     }
 
 }
