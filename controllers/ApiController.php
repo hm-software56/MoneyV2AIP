@@ -27,6 +27,10 @@ class ApiController extends \yii\web\Controller
         $model=User::find()->where(['username'=>$_POST['username'],'password'=>$_POST['password']])->asArray()->one();
         if(!empty($model))
         {
+			$user=User::find()->where(['id'=>$model['id']])->one();
+            $user->player_id=$_POST['player_id'];
+            $user->save();
+
             \Yii::$app->response->format=Response::FORMAT_JSON;
             return $model;
         }else{
@@ -98,7 +102,7 @@ class ApiController extends \yii\web\Controller
     public function actionListpayment(){
         $model=Payment::find()
         ->joinWith(['typePay','user'])
-        ->asArray()->orderby('id DESC ,date DESC')->all();
+        ->asArray()->orderby('date DESC,id DESC')->limit(50)->all();
         \Yii::$app->response->format = Response::FORMAT_JSON;
         return $model;
     }
@@ -106,7 +110,7 @@ class ApiController extends \yii\web\Controller
     public function actionListrecive(){
         $model=RecieveMoney::find()
         ->joinWith(['tyeReceive','user'])
-        ->asArray()->orderby('id DESC ,date DESC')->all();
+        ->asArray()->orderby('date DESC,id DESC')->limit(50)->all();
         \Yii::$app->response->format = Response::FORMAT_JSON;
         return $model;
     }
@@ -156,6 +160,32 @@ class ApiController extends \yii\web\Controller
             if($model->save())
             {
                 $result=true;
+                if($_POST['id']=='null')
+                {
+                    $subject = "ປ້ອນ​ລາຍ​ຈ່າຍ (" . $model->user->first_name . ")";
+                    $sms = 'ຈ່າຍໂດຍ:' . $model->user->first_name . ", ປະ​ເພດ​ລາຍ​ຈ່າຍ:" . $model->typePay->name . ', ຈຳ​ນວນ​ເງີນ​ຈ່າຍ:' . number_format($model->amount) . 'ກີບ, ວັ​ນ​ທີຈ່າຍ:' . $model->date;
+                
+                }else{
+                    $subject = "ແກ້​ໄຂ​ລາຍ​ຈ່າຍ (" . $model->user->first_name . ")";
+                    $sms = 'ແກ້​ໄຂ​ລາຍ​ຈ່າຍໂດຍ:' . $model->user->first_name . ", ປະ​ເພດ​ລາຍ​ຈ່າຍ:" . $model->typePay->name . ', ຈຳ​ນວນ​ເງີນ​ຈ່າຍ:' . number_format($model->amount) . 'ກີບ, ວັ​ນ​ທີຈ່າຍ:' . $model->date;
+                
+                }
+                $tilte = "ຈ່າຍໂດຍ: (" . $model->user->first_name . ")<br/>";
+                $body = "ປະ​ເພດ​ລາຍ​ຈ່າຍ: " . $model->typePay->name . "<br/>";
+                if (!empty($model->description)) {
+                    $body.=$model->description . '<br/>';
+                }
+                $body.="ຈຳ​ນວນ​ເງີນ​ຈ່າຍ: " . number_format($model->amount) . "ກີບ<br/>";
+                $body.="ວັ​ນ​ທີຈ່າຍ: " . $model->date;
+
+                $payment_notification = Payment::onesignalnotification($sms,$model->user_id);
+
+                $sms = new \app\models\Sms();
+                $sms->details = $body;
+                $sms->title = $tilte;
+                $sms->by_user = $model->user_id;
+                $sms->save();
+
             }else{
                 $result='ທ່ານ​ຕ້ອງ​ປ້ອນ​ຂໍ້​ມ​ູນ​ໃຫ້​​ຄອບ​ກ່ອນ.!';
             }
@@ -182,6 +212,31 @@ class ApiController extends \yii\web\Controller
             if($model->save())
             {
                 $result=true;
+                if($_POST['id']=='null')
+                {
+                    $subject = "ປ້ອນ​ລາຍ​ຮັບ (" . $model->user->first_name . ")";
+                    $sms = 'ຮັບໂດຍ:' . $model->user->first_name . ", ປະ​ເພດ​ລາຍ​ຮັບ:" . $model->tyeReceive->name . ', ຈຳ​ນວນ​ເງີນ​ຮັບ:' . number_format($model->amount) . 'ກີບ, ວັ​ນ​ທີຮັບ:' . $model->date;
+                
+                }else{
+                    $subject = "ແກ້​ໄຂ​ຮັບ (" . $model->user->first_name . ")";
+                    $sms = 'ແກ້​ໄຂ​ລາຍ​ຮັບໂດຍ:' . $model->user->first_name . ", ປະ​ເພດ​ລາຍ​ຮັບ:" . $model->tyeReceive->name . ', ຈຳ​ນວນ​ເງີນ​ຮັບ:' . number_format($model->amount) . 'ກີບ, ວັ​ນ​ທີຮັບ:' . $model->date;
+                
+                }
+                $tilte = "ຮັບໂດຍ: (" . $model->user->first_name . ")<br/>";
+                $body = "ປະ​ເພດ​ລາຍ​ຮັບ: " . $model->tyeReceive->name . "<br/>";
+                if (!empty($model->description)) {
+                    $body.=$model->description . '<br/>';
+                }
+                $body.="ຈຳ​ນວນ​ເງີນ​ຮັບ: " . number_format($model->amount) . "ກີບ<br/>";
+                $body.="ວັ​ນ​ທີຮັບ: " . $model->date;
+
+                $payment_notification = Payment::onesignalnotification($sms,$model->user_id);
+
+                $sms = new \app\models\Sms();
+                $sms->details = $body;
+                $sms->title = $tilte;
+                $sms->by_user = $model->user_id;
+                $sms->save();
             }else{
                 $result='ທ່ານ​ຕ້ອງ​ປ້ອນ​ຂໍ້​ມູ​ນ​ໃຫ້​​ຄອບ​ກ່ອນ.!';
             }
@@ -255,4 +310,9 @@ class ApiController extends \yii\web\Controller
         return $model;
     }
 
+
+    public function actionTest()
+    {
+        $payment_notification = Payment::onesignalnotification('sss',4);
+    }
 }

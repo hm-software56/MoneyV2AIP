@@ -75,4 +75,47 @@ class Payment extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
+
+    public static function onesignalnotification($sms,$user_id)
+    {
+        $user=User::find()->where(['id'=>$user_id])->one();
+        if(!empty($user))
+        {
+            $users=User::find()->select('player_id')->where('user_role_id='.$user->user_role_id.' and id not in('.$user->id.')')->asArray()->all();
+        }else{
+            $users=User::find()->select('player_id')->asArray()->all();
+        }
+        $player_id_arr=[];
+        foreach($users as $a)
+        {
+            $player_id_arr[]=$a['player_id'];
+        }
+        
+        $content = array(
+            "en" => $sms
+        );
+
+        $fields = array(
+            'app_id' => "8611a545-6f5f-4e15-9e3a-b992ae4c6cac",
+           // 'included_segments' => array('All'),
+            'include_player_ids' =>$player_id_arr,
+            'data' => array("foo" => "bar"),
+            'contents' => $content,
+            'small_icon' => "ic_stat_onesignal_default.png",
+            'large_icon' => "ic_stat_onesignal_default.png",
+        );
+
+        $fields = json_encode($fields);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8', 'Authorization: Basic ZjZjZjdmYjAtZTY1MC00NGQ4LWFlNDItNTQ4NzIwMGMyM2U0'));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_HEADER, FALSE);
+        curl_setopt($ch, CURLOPT_POST, TRUE);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        return $response;
+    }
 }
