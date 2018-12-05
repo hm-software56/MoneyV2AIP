@@ -728,6 +728,48 @@
         ]
     },
     {
+        "name": "hscstudio/yii2-chart",
+        "version": "1.0.0",
+        "version_normalized": "1.0.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/hscstudio/yii2-chart.git",
+            "reference": "9b823ec3f90b8966122a54001843324d593e6072"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/hscstudio/yii2-chart/zipball/9b823ec3f90b8966122a54001843324d593e6072",
+            "reference": "9b823ec3f90b8966122a54001843324d593e6072",
+            "shasum": ""
+        },
+        "time": "2015-06-18T02:58:11+00:00",
+        "type": "yii2-extension",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "hscstudio\\chart\\": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Hafid Mukhlasin",
+                "email": "hafidmukhlasin@gmail.com"
+            }
+        ],
+        "description": "Chart Extension for Yii 2.0 With ChartNewJs",
+        "keywords": [
+            "chart",
+            "chartNew",
+            "chartjs",
+            "extension",
+            "yii2"
+        ]
+    },
+    {
         "name": "imagine/imagine",
         "version": "v0.7.1",
         "version_normalized": "0.7.1.0",

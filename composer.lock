@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "47186098e7380a5ae2d767ec5ad680d9",
+    "content-hash": "87ddcab245834879de294d204394e503",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -213,6 +213,46 @@
                 "html"
             ],
             "time": "2018-02-23T01:58:20+00:00"
+        },
+        {
+            "name": "hscstudio/yii2-chart",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hscstudio/yii2-chart.git",
+                "reference": "9b823ec3f90b8966122a54001843324d593e6072"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hscstudio/yii2-chart/zipball/9b823ec3f90b8966122a54001843324d593e6072",
+                "reference": "9b823ec3f90b8966122a54001843324d593e6072",
+                "shasum": ""
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "hscstudio\\chart\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Hafid Mukhlasin",
+                    "email": "hafidmukhlasin@gmail.com"
+                }
+            ],
+            "description": "Chart Extension for Yii 2.0 With ChartNewJs",
+            "keywords": [
+                "chart",
+                "chartNew",
+                "chartjs",
+                "extension",
+                "yii2"
+            ],
+            "time": "2015-06-18T02:58:11+00:00"
         },
         {
             "name": "imagine/imagine",

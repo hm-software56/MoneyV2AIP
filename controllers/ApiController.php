@@ -48,13 +48,40 @@ class ApiController extends \yii\web\Controller
         $result=['total_pay'=>\number_format($sum_pay,2),'total_recieve'=>\number_format($sum_recive,2),'percent_pay'=>sprintf('%0.2f',$percent_pay),'percent_recive'=>sprintf('%0.2f',$percent_recive)];
        
         $pay_car =\Yii::$app->db->createCommand('SELECT sum(amount) FROM dao_car where status IN("Paid","Saving")')->queryScalar();
-        $still_pay=17000-$pay_car;
+        $still_pay=13928-$pay_car;
         $result_car=['pay_car'=>number_format($pay_car,2),'still_car'=>number_format($still_pay,2)];
         
         $result=array_merge($result,$result_car);
 
         \Yii::$app->response->format=Response::FORMAT_JSON;
         return $result;
+    }
+	
+	public function actionCharty(){
+		$result=[];
+		for($i=0;$i<=4;$i++)
+		{
+			$y = date('Y', strtotime('-'.$i.' years'));
+			$sum_pay =\Yii::$app->db->createCommand('SELECT sum(amount) FROM payment where year(date)='.$y.'')->queryScalar();
+			$sum_recive =\Yii::$app->db->createCommand('SELECT sum(amount) FROM recieve_money where year(date)='.$y.'')->queryScalar();
+			$result[]=['pay'=>(int)$sum_pay,'recive'=>(int)$sum_recive,'year'=>$y];
+	   }
+
+
+        \Yii::$app->response->format=Response::FORMAT_JSON;
+        return $result;
+    }
+	public function actionChartm(){
+		$result=[];
+		for($i=0;$i<=5;$i++)
+		{
+			$m=date("m", strtotime("-".$i." month"));
+			$sum_pay =\Yii::$app->db->createCommand('SELECT sum(amount) FROM payment where month(date)='.$m.'')->queryScalar();
+			$sum_recive =\Yii::$app->db->createCommand('SELECT sum(amount) FROM recieve_money where month(date)='.$m.'')->queryScalar();
+			$result[]=['pay'=>(int)$sum_pay,'recive'=>(int)$sum_recive,'year'=>$m];
+	   }
+       \Yii::$app->response->format=Response::FORMAT_JSON;
+       return $result;
     }
 
     public function actionUplaodfile()

@@ -57,4 +57,13 @@ return array (
       '@yii/imagine' => $vendorDir . '/yiisoft/yii2-imagine/src',
     ),
   ),
+  'hscstudio/yii2-chart' => 
+  array (
+    'name' => 'hscstudio/yii2-chart',
+    'version' => '1.0.0.0',
+    'alias' => 
+    array (
+      '@hscstudio/chart' => $vendorDir . '/hscstudio/yii2-chart',
+    ),
+  ),
 );

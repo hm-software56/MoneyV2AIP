@@ -1,53 +1,168 @@
 <?php
+use yii\helpers\Html;
+use yii\bootstrap\ActiveForm;
+use kartik\alert\Alert;
 
-/* @var $this yii\web\View */
+$js = <<< 'SCRIPT'
+/* To initialize BS3 tooltips set this below */
+$(function () {
+    $("[data-toggle='tooltip']").tooltip();
+});;
+/* To initialize BS3 popovers set this below */
+$(function () {
+    $("[data-toggle='popover']").popover();
+});
+SCRIPT;
+// Register tooltip/popover initialization javascript
+$this->registerJs($js);
+if (Yii::$app->session->hasFlash('su')) {
+    echo Alert::widget([
+        'type' => Alert::TYPE_SUCCESS,
+        'title' => Yii::$app->session->getFlash('action'),
+        'icon' => 'glyphicon glyphicon-ok',
+        'body' => Yii::$app->session->getFlash('su'),
+        'showSeparator' => false,
+        'delay' => 3000
+    ]);
+}
+//echo date('dHi') + 5;
+//echo Yii::$app->session['timeout'];
 
-$this->title = 'My Yii Application';
 ?>
-<div class="site-index">
+<?php
+use hscstudio\chart\ChartNew;
 
-    <div class="jumbotron">
-        <h1>Congratulations!</h1>
+?>
+    <div class="box box-solid bg-teal-gradient">
+        <div class="box-header">
+            <i class="fa fa-th"></i>
 
-        <p class="lead">You have successfully created your Yii-powered application.</p>
+            <h3 class="box-title">ສົມ​ທຽບລາຍ​ຈ່າຍເປັ​ນ​ອາ​ທິດ</h3>
 
-        <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com">Get started with Yii</a></p>
-    </div>
-
-    <div class="body-content">
-
-        <div class="row">
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/doc/">Yii Documentation &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/forum/">Yii Forum &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/extensions/">Yii Extensions &raquo;</a></p>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn bg-teal btn-sm" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn bg-teal btn-sm" data-widget="remove"><i class="fa fa-times"></i>
+                </button>
             </div>
         </div>
+        <div class="box-footer no-border">
+            <?php
+            $type_ps = \app\models\TypePay::find()->orderBy('sort ASC')->all();
+            $title = [];
+            $data = [];
+            foreach ($type_ps as $type_p) {
+                $title[] = $type_p->name;
+                if (Yii::$app->session['user']->user_type == "Admin") {
+                    $data[] = Yii::$app->db->createCommand('SELECT sum(amount)  FROM payment LEFT JOIN user ON payment.user_id=user.id  where payment.date BETWEEN "' . date("Y-m-d", strtotime('monday this week')) . '" and "' . date("Y-m-d", strtotime('sunday this week')) . '"  and type_pay_id=' . $type_p->id . ' and user.user_role_id=' . Yii::$app->session['user']->user_role_id . '')->queryScalar();
+                } else {
+                    $data[] = Yii::$app->db->createCommand('SELECT sum(amount)  FROM payment where date BETWEEN "' . date("Y-m-d", strtotime('monday this week')) . '" and "' . date("Y-m-d", strtotime('sunday this week')) . '"  and type_pay_id=' . $type_p->id . '')->queryScalar();
+                }
+            }
 
+            echo ChartNew::widget([
+                'type' => 'bar', # pie, doughnut, line, bar, horizontalBar, radar, polar, stackedBar, polarArea
+                'title' => 'PHP Framework',
+                'width' => '300',
+                'labels' => $title,
+                'colors' => [
+                    'soft' => ['#f44336'],
+                ],
+                'datasets' => [
+                    ['title' => '2014', 'data' => $data],
+                ],
+            ]);
+
+            ?>
+        </div>
     </div>
-</div>
+
+    <div class="box box-solid bg-teal-gradient">
+        <div class="box-header" style="background: #5ea7f4;">
+            <i class="fa fa-th"></i>
+
+            <h3 class="box-title">ສົມ​ທຽບລາຍ​ຈ່າຍເປັ​ນ​ເດືອນ</h3>
+
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-sm" data-widget="collapse" style="background: #569be5"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-sm" data-widget="remove" style="background: #569be5"><i class="fa fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-footer no-border">
+            <?php
+            $type_ps = \app\models\TypePay::find()->orderBy('sort ASC')->all();
+            $title = [];
+            $data = [];
+            foreach ($type_ps as $type_p) {
+                $title[] = $type_p->name;
+                if (Yii::$app->session['user']->user_type == "Admin") {
+                    $data[] = Yii::$app->db->createCommand('SELECT sum(amount)  FROM payment LEFT JOIN user ON payment.user_id=user.id where month(payment.date)="' . date('m') . '" and type_pay_id=' . $type_p->id . ' and user.user_role_id=' . Yii::$app->session['user']->user_role_id . '')->queryScalar();
+                } else {
+                    $data[] = Yii::$app->db->createCommand('SELECT sum(amount)  FROM payment where month(date)="' . date('m') . '"  and type_pay_id=' . $type_p->id . ' ')->queryScalar();
+                }
+            }
+            echo ChartNew::widget([
+                'type' => 'bar', # pie, doughnut, line, bar, horizontalBar, radar, polar, stackedBar, polarArea
+                'title' => 'PHP Framework',
+                'width' => '300',
+                'labels' => $title,
+                'colors' => [
+                    'soft' => ['#f44336'],
+                ],
+                'datasets' => [
+                    ['title' => '2014', 'data' => $data],
+                ],
+            ]);
+
+            ?>
+        </div>
+    </div>
+
+
+    <div class="box box-solid bg-teal-gradient">
+        <div class="box-header" style="background: #059e17;">
+            <i class="fa fa-th"></i>
+
+            <h3 class="box-title">ສົມ​ທຽບລາຍ​ຈ່າຍເປັ​ນ​ປີ</h3>
+
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-sm" data-widget="collapse" style="background: #039714"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-sm" data-widget="remove" style="background: #039714"><i class="fa fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="box-footer no-border">
+            <?php
+            $type_ps = \app\models\TypePay::find()->orderBy('sort ASC')->all();
+            $title = [];
+            $data = [];
+            foreach ($type_ps as $type_p) {
+                $title[] = $type_p->name;
+                if (Yii::$app->session['user']->user_type == "Admin") {
+                    $data[] = Yii::$app->db->createCommand('SELECT sum(amount)  FROM payment LEFT JOIN user ON payment.user_id=user.id where year(payment.date)="' . date('Y') . '" and type_pay_id=' . $type_p->id . ' and user.user_role_id=' . Yii::$app->session['user']->user_role_id . '')->queryScalar();
+                } else {
+                    $data[] = Yii::$app->db->createCommand('SELECT sum(amount)  FROM payment where year(date)="' . date('Y') . '"  and type_pay_id=' . $type_p->id . ' ')->queryScalar();
+                }
+            }
+            echo ChartNew::widget([
+                'type' => 'bar', # pie, doughnut, line, bar, horizontalBar, radar, polar, stackedBar, polarArea
+                'title' => 'PHP Framework',
+                'width' => '300',
+                'labels' => $title,
+                'colors' => [
+                    'soft' => ['#f44336'],
+                    'hard' => ['#f44336'],
+                ],
+                'datasets' => [
+                    ['title' => '2014', 'data' => $data],
+                ],
+            ]);
+
+            ?>
+        </div>
+    </div>
+
+

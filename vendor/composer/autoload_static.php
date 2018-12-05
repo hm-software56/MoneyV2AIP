@@ -32,6 +32,10 @@ class ComposerStaticInit30585fb478b358234ba8c1262c49f6d3
         array (
             'phpDocumentor\\Reflection\\' => 25,
         ),
+        'h' => 
+        array (
+            'hscstudio\\chart\\' => 16,
+        ),
         'c' => 
         array (
             'cebe\\markdown\\' => 14,
@@ -115,6 +119,10 @@ class ComposerStaticInit30585fb478b358234ba8c1262c49f6d3
             0 => __DIR__ . '/..' . '/phpdocumentor/reflection-common/src',
             1 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
             2 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
+        ),
+        'hscstudio\\chart\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/hscstudio/yii2-chart',
         ),
         'cebe\\markdown\\' => 
         array (
